@@ -23,8 +23,12 @@ model.load_state_dict(
 
 model.eval()
 
-correct = 0
-total = 0
+confusion = {
+    (0, 0): 0,
+    (0, 1): 0,
+    (1, 0): 0,
+    (1, 1): 0,
+}
 
 for seed in range(100):
     observation, info = env.reset(seed=seed)
@@ -41,16 +45,27 @@ for seed in range(100):
     true_label = int(info["distance"] < 20.0)
 
     with torch.no_grad():
-        logits = model(image)
-        predicted_label = logits.argmax(dim=1).item()
+        prediction = model(image)
+        predicted_label = prediction.argmax(dim=1).item()
 
-    if predicted_label == true_label:
-        correct += 1
+    confusion[(true_label, predicted_label)] += 1
 
-    total += 1
 
-accuracy = correct / total
+true_0 = confusion[(0, 0)] + confusion[(0, 1)]
+true_1 = confusion[(1, 0)] + confusion[(1, 1)]
 
-print("Images testées :", total)
-print("Prédictions correctes :", correct)
-print("Accuracy :", round(accuracy, 3))
+accuracy_0 = confusion[(0, 0)] / true_0 if true_0 else 0
+accuracy_1 = confusion[(1, 1)] / true_1 if true_1 else 0
+
+balanced_accuracy = (accuracy_0 + accuracy_1) / 2
+
+print("Matrice de confusion :")
+print("Vraie classe 0 -> classe 0 :", confusion[(0, 0)])
+print("Vraie classe 0 -> classe 1 :", confusion[(0, 1)])
+print("Vraie classe 1 -> classe 0 :", confusion[(1, 0)])
+print("Vraie classe 1 -> classe 1 :", confusion[(1, 1)])
+
+print()
+print("Accuracy classe 0 :", round(accuracy_0, 3))
+print("Accuracy classe 1 :", round(accuracy_1, 3))
+print("Balanced accuracy :", round(balanced_accuracy, 3))

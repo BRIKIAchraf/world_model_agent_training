@@ -10,6 +10,9 @@ Projet pédagogique construit étape par étape autour d'un agent World Model.
 - Encodeur d'instructions structurées et fusion par concaténation.
 - Dataset de distance robot-cible.
 - Classifieur visuel entraînable et scripts d'évaluation.
+- Classifieur multimodal image + instruction cible.
+
+Le détail des problèmes rencontrés, des diagnostics et des solutions se trouve dans [docs/EXPERIMENT_LOG.md](docs/EXPERIMENT_LOG.md).
 
 ## Installation
 
