@@ -1,7 +1,11 @@
 import numpy as np
 import torch
 import torch.nn as nn
-from torch.utils.data import TensorDataset, DataLoader, random_split
+from torch.utils.data import (
+    TensorDataset,
+    DataLoader,
+    random_split,
+)
 
 from models.encoders import VisualEncoder, TextEncoder
 from models.fusion import ConcatFusion
@@ -17,7 +21,7 @@ class MultimodalClassifier(nn.Module):
 
         self.text_encoder = TextEncoder(
             n_instructions=3,
-            out_dim=256,
+            out_dim=256
         )
 
         self.fusion = ConcatFusion(
@@ -35,7 +39,7 @@ class MultimodalClassifier(nn.Module):
 
         fused_embedding = self.fusion(
             visual_embedding,
-            text_embedding,
+            text_embedding
         )
 
         return self.classifier(fused_embedding)
@@ -47,17 +51,17 @@ data = np.load(
 
 images = torch.tensor(
     data["images"],
-    dtype=torch.float32,
+    dtype=torch.float32
 )
 
 instructions = torch.tensor(
     data["instructions"],
-    dtype=torch.long,
+    dtype=torch.long
 )
 
 labels = torch.tensor(
     data["labels"],
-    dtype=torch.long,
+    dtype=torch.long
 )
 
 images = images.permute(0, 3, 1, 2)
@@ -66,7 +70,7 @@ images = images / 255.0
 dataset = TensorDataset(
     images,
     instructions,
-    labels,
+    labels
 )
 
 train_size = int(0.8 * len(dataset))
@@ -75,42 +79,55 @@ test_size = len(dataset) - train_size
 train_dataset, test_dataset = random_split(
     dataset,
     [train_size, test_size],
-    generator=torch.Generator().manual_seed(0),
+    generator=torch.Generator().manual_seed(0)
 )
 
 train_loader = DataLoader(
     train_dataset,
     batch_size=32,
-    shuffle=True,
+    shuffle=True
 )
 
 test_loader = DataLoader(
     test_dataset,
-    batch_size=32,
+    batch_size=32
 )
 
 model = MultimodalClassifier()
 
-loss_function = nn.CrossEntropyLoss()
+# La classe 0 reçoit plus de poids
+class_weights = torch.tensor(
+    [1.4, 1.0],
+    dtype=torch.float32
+)
+
+loss_function = nn.CrossEntropyLoss(
+    weight=class_weights
+)
 
 optimizer = torch.optim.Adam(
     model.parameters(),
-    lr=0.001,
+    lr=0.001
 )
 
 for epoch in range(10):
     model.train()
     total_loss = 0.0
 
-    for batch_images, batch_instructions, batch_labels in train_loader:
+    for (
+        batch_images,
+        batch_instructions,
+        batch_labels,
+    ) in train_loader:
+
         predictions = model(
             batch_images,
-            batch_instructions,
+            batch_instructions
         )
 
         loss = loss_function(
             predictions,
-            batch_labels,
+            batch_labels
         )
 
         optimizer.zero_grad()
@@ -124,10 +141,15 @@ for epoch in range(10):
     total = 0
 
     with torch.no_grad():
-        for batch_images, batch_instructions, batch_labels in test_loader:
+        for (
+            batch_images,
+            batch_instructions,
+            batch_labels,
+        ) in test_loader:
+
             predictions = model(
                 batch_images,
-                batch_instructions,
+                batch_instructions
             )
 
             predicted_classes = predictions.argmax(
@@ -150,7 +172,7 @@ for epoch in range(10):
 
 torch.save(
     model.state_dict(),
-    "outputs/multimodal_anomaly_classifier.pt",
+    "outputs/multimodal_anomaly_classifier.pt"
 )
 
 print(
