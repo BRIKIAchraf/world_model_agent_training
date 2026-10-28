@@ -27,7 +27,7 @@ jobs:
         run: git archive --format=zip --output=world_model_agent_training.zip HEAD
 
       - name: Upload delivery artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: world-model-agent-training
           path: world_model_agent_training.zip
