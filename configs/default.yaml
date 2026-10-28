@@ -1,0 +1,13 @@
+seed: 0
+image_size: 64
+latent_dim: 32
+deter_dim: 200
+embed_dim: 256
+batch_size: 16
+seq_len: 50
+horizon: 15
+gamma: 0.99
+lambda_: 0.95
+lr_world: 0.0003
+lr_actor: 0.00008
+lr_critic: 0.00008
