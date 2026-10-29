@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 
 import matplotlib.pyplot as plt
+import pandas as pd
 import streamlit as st
 
 
@@ -48,11 +49,31 @@ if epochs:
 
     if "loss" in history:
         with columns[0]:
-            st.line_chart({"Loss": history["loss"]}, x=epochs)
+            loss_data = pd.DataFrame(
+                {
+                    "epoch": epochs,
+                    "Loss": history["loss"],
+                }
+            )
+            st.line_chart(
+                loss_data,
+                x="epoch",
+                y="Loss",
+            )
 
     if "accuracy" in history:
         with columns[1]:
-            st.line_chart({"Accuracy": history["accuracy"]}, x=epochs)
+            accuracy_data = pd.DataFrame(
+                {
+                    "epoch": epochs,
+                    "Accuracy": history["accuracy"],
+                }
+            )
+            st.line_chart(
+                accuracy_data,
+                x="epoch",
+                y="Accuracy",
+            )
 
 evaluation = metrics.get("evaluation", {})
 

@@ -6,4 +6,5 @@ pyyaml
 matplotlib
 pytest
 streamlit
+pandas
 
