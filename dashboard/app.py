@@ -78,17 +78,36 @@ if epochs:
 evaluation = metrics.get("evaluation", {})
 
 if evaluation:
-    st.subheader("Résultats d'évaluation")
-    st.metric(
-        "Accuracy globale",
-        f"{evaluation.get('accuracy', 0.0):.3f}",
-    )
+    st.subheader("Indicateurs d'évaluation")
 
-    if "balanced_accuracy" in evaluation:
-        st.metric(
-            "Balanced accuracy",
-            f"{evaluation['balanced_accuracy']:.3f}",
-        )
+    metric_rows = [
+        {
+            "Indicateur": "Accuracy globale",
+            "Valeur": evaluation.get("accuracy", 0.0),
+        },
+        {
+            "Indicateur": "Balanced accuracy",
+            "Valeur": evaluation.get("balanced_accuracy", 0.0),
+        },
+        {
+            "Indicateur": "Accuracy classe normale",
+            "Valeur": evaluation.get("accuracy_class_0", 0.0),
+        },
+        {
+            "Indicateur": "Accuracy classe défectueuse",
+            "Valeur": evaluation.get("accuracy_class_1", 0.0),
+        },
+    ]
+
+    metric_data = pd.DataFrame(metric_rows)
+
+    st.bar_chart(
+        metric_data,
+        x="Indicateur",
+        y="Valeur",
+        y_label="Score",
+        height=350,
+    )
 
     confusion = evaluation.get("confusion")
 
@@ -118,7 +137,4 @@ if evaluation:
                 )
 
         st.pyplot(figure)
-
-st.subheader("Données brutes")
-st.json(metrics)
 
