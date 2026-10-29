@@ -43,6 +43,39 @@ metrics = load_metrics(selected_file)
 history = metrics.get("history", {})
 epochs = history.get("epoch", [])
 
+structure = metrics.get("structure")
+
+if structure:
+    st.subheader("Structure du modèle")
+    st.graphviz_chart(
+        metrics.get("diagram", ""),
+        use_container_width=True,
+    )
+
+    structure_data = pd.DataFrame(
+        {
+            "Composant": [
+                "Batch",
+                "État déterministe",
+                "État stochastique",
+                "Features RSSM",
+            ],
+            "Dimension": [
+                structure["batch_size"],
+                structure["deter_dim"],
+                structure["stoch_dim"],
+                structure["feature_dim"],
+            ],
+        }
+    )
+
+    st.bar_chart(
+        structure_data,
+        x="Composant",
+        y="Dimension",
+        y_label="Nombre de valeurs",
+    )
+
 if epochs:
     st.subheader("Évolution de l'entraînement")
     columns = st.columns(2)
