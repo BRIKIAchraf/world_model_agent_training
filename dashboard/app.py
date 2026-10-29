@@ -78,35 +78,40 @@ if structure:
 
 if epochs:
     st.subheader("Évolution de l'entraînement")
-    columns = st.columns(2)
+    history_data = pd.DataFrame(
+        {
+            key: values
+            for key, values in history.items()
+            if key != "epoch"
+        },
+        index=epochs,
+    )
 
-    if "loss" in history:
-        with columns[0]:
-            loss_data = pd.DataFrame(
-                {
-                    "epoch": epochs,
-                    "Loss": history["loss"],
-                }
-            )
-            st.line_chart(
-                loss_data,
-                x="epoch",
-                y="Loss",
-            )
+    loss_columns = [
+        column
+        for column in history_data.columns
+        if "accuracy" not in column.lower()
+    ]
 
-    if "accuracy" in history:
-        with columns[1]:
-            accuracy_data = pd.DataFrame(
-                {
-                    "epoch": epochs,
-                    "Accuracy": history["accuracy"],
-                }
-            )
-            st.line_chart(
-                accuracy_data,
-                x="epoch",
-                y="Accuracy",
-            )
+    accuracy_columns = [
+        column
+        for column in history_data.columns
+        if "accuracy" in column.lower()
+    ]
+
+    if loss_columns:
+        st.markdown("**Courbes de loss**")
+        st.line_chart(
+            history_data[loss_columns],
+            y_label="Loss",
+        )
+
+    if accuracy_columns:
+        st.markdown("**Courbes de performance**")
+        st.line_chart(
+            history_data[accuracy_columns],
+            y_label="Score",
+        )
 
 evaluation = metrics.get("evaluation", {})
 
