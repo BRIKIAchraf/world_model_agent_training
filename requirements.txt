@@ -5,4 +5,5 @@ mujoco
 pyyaml
 matplotlib
 pytest
+streamlit
 
